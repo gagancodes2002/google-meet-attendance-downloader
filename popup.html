@@ -640,28 +640,72 @@
             <br>
             <div class="row">
                 <center>
-                    <label style="font-weight: bold;">
-                        Filename
-                    </label>
+                    <table>
+                        <tr>
+                            <th> 
+                                <label style="font-weight: bold;">
+                                    Filename
+                                </label>
+                            </th>
+                            <th>
+                                <label style="font-weight: bold;">
+                                    Sub Filename
+                                </label>
+                            </th>
+                            <th>
+                                <label for="Date" data-toggle="popover" title="Add Todays Date">
+                                    Date
+                                </label>
+                            </th>
+                            <th> <label for="Format">
+                                Format
+                            </label></th>
+                        </tr>
+                        <tr>
+                            <td> 
+                                <input type="checkbox" id="FilenameBoolean" value="true" name="Date">
+
+                            </td>
+                            <td>
+                                <input type="checkbox" id="SubFilenameBoolean" value="true" name="Date">
+                            </td>
+                            <td>
+                                <input type="checkbox" id="DateBoolean" value="true" name="Date">
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td> <select name="SavedFileNames" id="FileNames"></select>
+                            </td>
+                            <td><input type="text" name='subName' id='subName' value=""></td>
+                            <td>
+
+                                <select name="DateFormatHome" id="DateFormatHome">
+                                    <option>mm/dd/yyyy</option>
+                                    <option>dd/mm/yyyy</option>
+                                    <option>Month dd yyyy</option>
+                                </select>
+
+
+                            </td>
+                            <td> <select name="Format" id="FileFormat">
+                                    <option value="csv" class="Options">Excel</option>
+                                    <option value="docx" class="Options">Word</option>
+                                    <option value="txt" class="Options">Notepad</option>
+
+                                </select></td>
+                        </tr>
+
+                    </table>
 
 
 
-                    <select name="SavedFileNames" id="FileNames">
 
 
 
-                    </select>
 
-                    </datalist>
-                    <label for="Date" data-toggle="popover" title="Add Todays Date">Date</label>
-                    <input type="checkbox" id="DateBoolean" value="true" name="Date">
-                    <label for="Format">Format</label>
-                    <select name="Format" id="FileFormat">
-                        <option value="csv" class="Options">Excel</option>
-                        <option value="docx" class="Options">Word</option>
-                        <option value="txt" class="Options">Notepad</option>
 
-                    </select>
+
                 </center>
 
                 <br>

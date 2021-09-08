@@ -1,4 +1,6 @@
+var FirstName = '';
 try {
+    
     chrome.runtime.onInstalled.addListener(reason => {
         if (reason === chrome.runtime.OnInstalledReason.INSTALL) {
             chrome.runtime.setUninstallURL('https://forms.gle/oqDNuUZ5QyCKcKPh7');
@@ -167,12 +169,14 @@ try {
             }
 
         });
-        callback();
+        callback(GlobalSDF);
+        return GlobalSDF;
     }
 
     function SetDefaultDateFormat() {
-        GetSavedDateFormat(function () {
-            document.querySelectorAll("select[name='DateFormat'] > option")[GlobalSDF].defaultSelected = true;
+        GetSavedDateFormat(function (defSelection) {
+            document.querySelectorAll("select[name='DateFormat'] > option")[defSelection].defaultSelected = true;
+            document.querySelectorAll("select[name='DateFormatHome'] > option")[defSelection].defaultSelected = true;
         })
     }
 
@@ -318,28 +322,11 @@ try {
         })
 
 
-    })
+    });
 
 
 
 
-
-
-
-    function isGoogleMeetOpen() {
-        var UrlStr = window.location.href;
-
-        if (UrlStr.search("meet.google.com") >= 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function isPListOpen() {
-        var PLName = document.getElementsByClassName("ZjFb7c");
-        return PLName[0].innerText;
-    }
 
 
 
@@ -376,15 +363,8 @@ try {
             txt += row;
             txt += "\n";
         });
-
-        var hiddenElement = document.createElement('a');
-        hiddenElement.style.display = "none";
-        hiddenElement.innerText = FileNameStr;
-        hiddenElement.href = 'data:text/txt;charset=utf-8,' + encodeURI(txt);
-        hiddenElement.target = '_blank';
-        hiddenElement.download = FileNameStr;
-        body.append(hiddenElement);
-        hiddenElement.click();
+        downloadFile(FileNameStr,'data:text/txt;charset=utf-8,' + encodeURI(txt));
+        
     }
 
 
@@ -396,45 +376,52 @@ try {
             docx += row;
             docx += "\n";
         });
-
-        var hiddenElement = document.createElement('a');
-        hiddenElement.style.display = "none";
-        hiddenElement.innerText = FileNameStr;
-        hiddenElement.href = 'data:text/docx;charset=utf-8,' + encodeURI(docx);
-        hiddenElement.target = '_blank';
-        hiddenElement.download = FileNameStr;
-        body.append(hiddenElement);
-        hiddenElement.click();
+        downloadFile(FileNameStr,'data:text/docx;charset=utf-8,' + encodeURI(docx));
+        
     }
 
 
 
     function download_csv_file(csvFileData, FileNameStr) {
-        //define the heading for each row of the data  
         
-        var csv = "";
+        console.log(FileNameStr);
+        console.log('File name : '+FileNameStr.getFullFileName())
+            var csv = `Date : , ${FileNameStr.datebool},\nHost Name : ,${FileNameStr.hostname},\nTotal Attendees : ,${csvFileData.length},\nSubject : ,${FileNameStr.filename},\nAttendees,\n`; 
+            
+        
+            csvFileData.forEach(function (row) {
+                
+                csv += row;
+                csv+= '\n';
+                 
+            });
+            downloadFile(FileNameStr,'data:text/xlsx;charset=utf-8,' + encodeURI(csv))
+       
 
-        //merge the data with CSV  
-        csvFileData.forEach(function (row) {
-            csv += row;
-            csv += "\n";
-        });
+      
+        
+        
 
-        //display the created CSV data on the web browser   
-        //  document.write(csv);  
-
-        var body = document.getElementsByTagName("body")[0];
-
-        var hiddenElement = document.createElement('a');
-        hiddenElement.style.display = "none";
-        hiddenElement.innerText = FileNameStr;
-        hiddenElement.href = 'data:text/xlsx;charset=utf-8,' + encodeURI(csv);
-        hiddenElement.target = '_blank';
-        hiddenElement.style.display = "none";
-        hiddenElement.download = FileNameStr;
-        body.append(hiddenElement);
-        hiddenElement.click();
+        // chrome.downloads.download({
+        //     url:  'data:text/xlsx;charset=utf-8,' + encodeURI(csv),
+        //     filename: filename,
+        //     saveAs: false,
+        //     conflictAction: "overwrite",
+        //   });
+        
     }
+
+    function downloadFile(FileNameStr,url)
+    {
+        var filename = "GMA Downloader\\"+FileNameStr.filename+"\\" + FileNameStr.getFullFileName();
+        chrome.downloads.download({
+            url:  url,
+            filename: filename,
+            saveAs: false,
+            conflictAction: "overwrite",
+          });
+    }
+
 
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -461,10 +448,11 @@ try {
 
 
 
-    function Toast(FileName) {
+    function Toast(FileNameStr) {
 
         var x = document.getElementById("snackbar");
-        x.className = "show";
+        x.className = "show";f=
+        x.innerText += '\n'+FileNameStr.getFullFileName();
         setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
 
     }
@@ -473,7 +461,7 @@ try {
     document.addEventListener('DOMContentLoaded', () => {
         const Clip = document.querySelector('#check-2');
         Clip.addEventListener('click', async () => {
-            var FileNameStr = ""
+            
             var Filename = document.getElementById("FileNames");
             var d = new Date();
             var todaysDate;
@@ -492,14 +480,25 @@ try {
                 default:
                     break;
             }
-
-            var x = document.getElementById('DateBoolean');
-            DateBool = "";
+            var fileNameBoolean = document.getElementById('FilenameBoolean');
+            var subFileNameBoolean = document.getElementById('SubFilenameBoolean');
+            var dateBoolean = document.getElementById('DateBoolean');
+            var FileName =  fileNameBoolean.checked ? document.getElementById('FileNames').value : "";
+            var SubFileName =  subFileNameBoolean.checked ? document.getElementById('subName').value :"";
+            var DateBool = dateBoolean.checked ? todaysDate :"";
+            
             var FileExt = document.getElementById("FileFormat");
-            if (x.checked) {
-                DateBool = todaysDate;
+            var FileNameStr = {
+                filename :  FileName,
+                subfilename : SubFileName,
+                datebool : DateBool,
+                fileext : FileExt.value,
+                hostname : FirstName,
+                getFullFileName : function(){return `${this.filename+this.subfilename+this.datebool+'.'+this.fileext}`}
             }
-            FileNameStr = Filename.value + DateBool + "." + FileExt.value;
+
+
+          
             TextField = document.getElementById("TText");
             var FinalOutputList = TextField.value.split('\n');
 
@@ -536,7 +535,7 @@ try {
         var GetAttendanceBTN = document.getElementById("check-1");
         GetAttendanceBTN.addEventListener("click", function () {
             port.postMessage({ joke: "Knock knock" });
-
+            
 
         })
 
@@ -586,7 +585,8 @@ try {
         port.onMessage.addListener(function (msg) {
           
             if (msg.request == "setList") {
-                
+                FirstName = msg.hostname;
+                console.log("Presenter : "+FirstName);
                 const TextField = document.getElementById("TText");
                 TextField.innerText = "";
                 for (i = 0; i < msg.data.length; i++) {
@@ -615,7 +615,7 @@ try {
               
                 var List = document.getElementById("TText").value.split("\n");
            
-                var FirstName = msg.data;
+                FirstName = msg.data;
                 for (i = 0; i < List.length; i++) {
                     if (List[i] == FirstName) {
                         List[i] = ""

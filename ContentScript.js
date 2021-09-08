@@ -7,8 +7,13 @@
 
             ScrapeAttendees(function (result) {
                 
-                  
-                    port.postMessage({ request: "setList", data: result});
+                console.log('Data : '+result);
+                  getPresenterName(function(name)
+                  {
+                    console.log('Data : '+result+'Host name : '+name);
+                    port.postMessage({ request: "setList", data: result , hostname  : name});
+                   
+                  })
                    
            
                
