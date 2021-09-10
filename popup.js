@@ -1,6 +1,8 @@
+
+
 var FirstName = '';
 try {
-    
+
     chrome.runtime.onInstalled.addListener(reason => {
         if (reason === chrome.runtime.OnInstalledReason.INSTALL) {
             chrome.runtime.setUninstallURL('https://forms.gle/oqDNuUZ5QyCKcKPh7');
@@ -15,13 +17,13 @@ try {
         var listItems = list.querySelectorAll("li")
         listItems.forEach(function (item, n) {
             if (!item.getAttribute("data-new")) {
-               
+
                 listData.push(item.innerText);
             }
 
         })
         chrome.storage.local.set({ FileNameList: listData }, function () {
-            
+
         });
 
     }
@@ -30,11 +32,11 @@ try {
     async function GetData(callback) {
 
         await chrome.storage.local.get(['FileNameList'], async function (result) {
-          
+
             GlobalDataList = result.FileNameList;
 
         });
-      
+
         callback();
 
 
@@ -59,16 +61,16 @@ try {
                    `;
                     list.appendChild(entry);
                 })
-               
+
             }
             else {
-          
-                
+
+
             }
 
         });
-       
-        
+
+
         $("#list").append(` <li data-new="true">
          <span>add another</span>
          <input type="text">
@@ -126,8 +128,8 @@ try {
     }
 
     function addChild() {
-     
-        
+
+
         UpdateList()
         var entry = document.createElement('li');
         entry.innerHTML = "<span>add another</span><input type='text'>";
@@ -141,7 +143,7 @@ try {
             console.log("Callback Home 2" + GlobalDataList)
             if (GlobalDataList) {
                 GlobalDataList.forEach(function (item, n) {
-                    console.log('Inside WOrk : '+item);
+                    console.log('Inside WOrk : ' + item);
                     $('#FileNames').append(`<option value="${item}" class="Options">${item}</option>`)
                 });
             }
@@ -157,8 +159,8 @@ try {
 
     async function GetSavedDateFormat(callback) {
         await chrome.storage.local.get(['SavedDateType'], async function (result) {
-     
-            
+
+
             if (result.SavedDateType) {
                 GlobalSDF = result.SavedDateType;
 
@@ -182,11 +184,11 @@ try {
 
 
     async function SetSavedDateFormat(selection) {
-     
-        
+
+
         await chrome.storage.local.set({ SavedDateType: selection }, function () {
-      
-            
+
+
         });
     }
     document.addEventListener("DOMContentLoaded", () => {
@@ -286,6 +288,15 @@ try {
 
     }
 
+    function getSS() {
+        html2canvas(document.getElementsByClassName("GvcuGe")[0], { useCORS: true }).then(function (canvas) {
+            var myImage = canvas.toDataURL("image/png");
+
+            console.log("myImage : " + myImage);
+
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("SettingBTN").addEventListener("click", () => {
             window.open(document.URL + "#Settings", "_self")
@@ -337,10 +348,10 @@ try {
         // Keep this function isolated - it can only call methods you set up in content scripts
         MovieList = document.getElementsByClassName("ZjFb7c");
         var Attendees = [];
-    
+
         //console.log(document.getElementsByClassName("titleColumn")[0].getElementsByTagName("a")[0].text);
         for (i = 0; i < MovieList.length; i++) {
-          
+
             Attendees.push(MovieList[i].innerText);
         }
 
@@ -363,8 +374,8 @@ try {
             txt += row;
             txt += "\n";
         });
-        downloadFile(FileNameStr,'data:text/txt;charset=utf-8,' + encodeURI(txt));
-        
+        downloadFile(FileNameStr, 'data:text/txt;charset=utf-8,' + encodeURI(txt));
+
     }
 
 
@@ -376,31 +387,220 @@ try {
             docx += row;
             docx += "\n";
         });
-        downloadFile(FileNameStr,'data:text/docx;charset=utf-8,' + encodeURI(docx));
-        
+        downloadFile(FileNameStr, 'data:text/docx;charset=utf-8,' + encodeURI(docx));
+
+    }
+    function sheet_from_array_of_arrays(data, opts) {
+        var ws = {};
+        var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 } };
+        for (var R = 0; R != data.length; ++R) {
+            for (var C = 0; C != data[R].length; ++C) {
+                if (range.s.r > R) range.s.r = R;
+                if (range.s.c > C) range.s.c = C;
+                if (range.e.r < R) range.e.r = R;
+                if (range.e.c < C) range.e.c = C;
+                var cell = { v: data[R][C] };
+                if (cell.v == null) continue;
+                var cell_ref = XLSX.utils.encode_cell({ c: C, r: R });
+
+                if (typeof cell.v === 'number') cell.t = 'n';
+                else if (typeof cell.v === 'boolean') cell.t = 'b';
+                else if (cell.v instanceof Date) {
+                    cell.t = 'n'; cell.z = XLSX.SSF._table[14];
+                    cell.v = datenum(cell.v);
+                }
+                else cell.t = 's';
+
+                if (C == 0 & R == 0) {
+                    cell.s =
+                    {
+                        font: {
+                            name: 'Calibri',
+                            bold: true,
+                            sz: "24",
+                            color:
+                                { rgb: 'f4f4ff' }
+                        },
+                        alignment:
+                        {
+                            horizontal: "center",
+
+                            vertical: "center"
+
+                        },
+                        fill:
+                        {
+                            fgColor: { rgb: "212121" }
+                        },
+
+                    }
+                }
+                if( (C <= 12 & C >= 0) & (R <= 7 & R >= 3) )
+                {
+                    cell.s = {
+                        fill:
+                        {
+                            fgColor: { rgb: "ebf1de" }
+                        },
+                    }
+                }
+                if((C == 4 ||C == 5 ||C == 8 || C == 9) & (R >= 4 && R <= 6) )
+                {
+                    cell.s = {
+                        fill:
+                        {
+                            fgColor: { rgb: "ffff99" }
+                        },
+                        border:
+                        {
+                            top : {
+                                style : 'thin'
+                            },
+                            right : {
+                                style : 'thin'
+                            },
+                            left : {
+                                style : 'thin'
+                            },
+                            bottom : {
+                                style : 'thin'
+                            }
+                            
+                            
+                        },
+                        alignment : {
+                            horizontal : 'left'
+                        }
+                    }
+                }
+               if(R == 8 & C == 0)
+               {
+                   cell.s =
+                   {
+                        fill : 
+                        {
+                            fgColor : {rgb : 'c5d9f1'}
+                        }
+                   }
+               }
+              
+                // if (C == 0) {
+                //     cell.s = {
+                //         font: {
+                //             bold: true
+                //         }
+                //     }
+                // }
+                // if (R == 0) {
+                //     cell.s = {
+                //         fill: {
+                //             fgColor: { rgb: "212121" }
+                //         }
+                //     }
+                // }
+                const merge = [
+                    { s: { r: 0, c: 0 }, e: { r: 2, c: 12 } },
+                    { s: { r: 4, c: 4 }, e: { r: 4, c: 5 } },
+                    { s: { r: 5, c: 4 }, e: { r: 5, c: 5 } },
+                    { s: { r: 6, c: 4 }, e: { r: 6, c: 5 } },
+                    { s: { r: 4, c: 8 }, e: { r: 4, c: 9 } },
+                    { s: { r: 5, c: 8 }, e: { r: 5, c: 9 } },
+                    { s: { r: 6, c: 8 }, e: { r: 6, c: 9 } },
+
+
+                ];
+                ws["!merges"] = merge;
+                ws[cell_ref] = cell;
+            }
+        }
+        if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range);
+        return ws;
+    }
+    function Workbook() {
+        if (!(this instanceof Workbook)) return new Workbook();
+        this.SheetNames = [];
+        this.Sheets = {};
+    }
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
     }
 
-
-
     function download_csv_file(csvFileData, FileNameStr) {
-        
-        console.log(FileNameStr);
-        console.log('File name : '+FileNameStr.getFullFileName())
-            var csv = `Date : , ${FileNameStr.datebool},\nHost Name : ,${FileNameStr.hostname},\nTotal Attendees : ,${csvFileData.length},\nSubject : ,${FileNameStr.filename},\nAttendees,\n`; 
-            
-        
-            csvFileData.forEach(function (row) {
-                
-                csv += row;
-                csv+= '\n';
-                 
-            });
-            downloadFile(FileNameStr,'data:text/xlsx;charset=utf-8,' + encodeURI(csv))
-       
 
-      
-        
-        
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var data = [['Meeting Attendance Sheet', , ,],
+        ["","","","","","","","","","","","","","","","",],
+        ["","","","","","","","","","","","","","","","",],
+        ["","","","","","","","","","","","","","","","",],
+        ["","","" , "Date : ", FileNameStr.datebool, "", "", "Time :", time,"","","","","","","","","","","","","",""],
+        ["","","" ,  "Subject : ", FileNameStr.filename,"" ,"" , "Total Attendees :", csvFileData.length,"","","","","","","","","","","","","",""],
+        ["","","" ,  "Host Name : ", FileNameStr.hostname, "", "", "Remark :", 'lipsum lorem',"","","","","","","","","","","","","",""],
+        ["","","","","","","","","","","","","","","","",],
+        ["Name","","","","","","","","","","","","","","","",],
+            // ["Subject", FileNameStr.filename, ,],
+            // ["Hostname", FileNameStr.hostname ,,],
+            // ["Total Attendees",12, ,],
+            // ["Attendees",,,],
+
+        ]
+
+        csvFileData.map((item,k)=>
+        {
+            data.push([item, , ,]);
+        })
+
+        var ws_name = "SheetJS";
+        var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+        /* add worksheet to workbook */
+        wb.SheetNames.push(ws_name);
+        wb.Sheets[ws_name] = ws;
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+        var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        var url = window.URL || window.webkitURL;
+        var link = url.createObjectURL(blob);
+        console.log('Link : ' + link);
+        downloadFile(FileNameStr, link);
+
+        //     var wb = XLSX.utils.book_new();
+        //     wb.Props = {
+        //         Title: FileNameStr.getFullFileName(),
+        //         Subject: FileNameStr.subfilename,
+        //         Author: FileNameStr.hostname,
+        //         CreatedDate: FileNameStr.datebool
+        // };
+        // wb.SheetNames.push("Test Sheet");
+        // var ws_data = [['hello' , 'world']];
+        // var ws = XLSX.utils.aoa_to_sheet(ws_data);
+        // wb.Sheets["Test Sheet"] = ws;
+        // var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+        // var blob = new Blob([s2ab(wbout)],{type:"application/octet-stream"});
+        // var url = window.URL || window.webkitURL;
+        // var link = url.createObjectURL(blob);
+        // console.log('Link : '+link);
+        // downloadFile(FileNameStr,link);
+
+        // console.log(FileNameStr);
+        // console.log('File name : '+FileNameStr.getFullFileName())
+        //     var csv = `Date : , ${FileNameStr.datebool},\nHost Name : ,${FileNameStr.hostname},\nTotal Attendees : ,${csvFileData.length},\nSubject : ,${FileNameStr.filename},\nAttendees,\n`; 
+
+
+        //     csvFileData.forEach(function (row) {
+
+        //         csv += row;
+        //         csv+= '\n';
+
+        //     });
+
+
+
+
+
+
+
 
         // chrome.downloads.download({
         //     url:  'data:text/xlsx;charset=utf-8,' + encodeURI(csv),
@@ -408,18 +608,17 @@ try {
         //     saveAs: false,
         //     conflictAction: "overwrite",
         //   });
-        
+
     }
 
-    function downloadFile(FileNameStr,url)
-    {
-        var filename = "GMA Downloader\\"+FileNameStr.filename+"\\" + FileNameStr.getFullFileName();
+    function downloadFile(FileNameStr, url) {
+        var filename = "GMA Downloader\\" + FileNameStr.filename + "\\" + FileNameStr.getFullFileName();
         chrome.downloads.download({
-            url:  url,
+            url: url,
             filename: filename,
             saveAs: false,
             conflictAction: "overwrite",
-          });
+        });
     }
 
 
@@ -451,8 +650,8 @@ try {
     function Toast(FileNameStr) {
 
         var x = document.getElementById("snackbar");
-        x.className = "show";f=
-        x.innerText += '\n'+FileNameStr.getFullFileName();
+        x.className = "show"; f =
+            x.innerText += '\n' + FileNameStr.getFullFileName();
         setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
 
     }
@@ -461,11 +660,11 @@ try {
     document.addEventListener('DOMContentLoaded', () => {
         const Clip = document.querySelector('#check-2');
         Clip.addEventListener('click', async () => {
-            
+
             var Filename = document.getElementById("FileNames");
             var d = new Date();
             var todaysDate;
-            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];  
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             switch (GlobalSDF) {
                 case 0:
                     todaysDate = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + (d.getDate())).slice(-2) + "-" + (d.getFullYear());
@@ -483,29 +682,29 @@ try {
             var fileNameBoolean = document.getElementById('FilenameBoolean');
             var subFileNameBoolean = document.getElementById('SubFilenameBoolean');
             var dateBoolean = document.getElementById('DateBoolean');
-            var FileName =  fileNameBoolean.checked ? document.getElementById('FileNames').value : "";
-            var SubFileName =  subFileNameBoolean.checked ? document.getElementById('subName').value :"";
-            var DateBool = dateBoolean.checked ? todaysDate :"";
-            
+            var FileName = fileNameBoolean.checked ? document.getElementById('FileNames').value : "";
+            var SubFileName = subFileNameBoolean.checked ? document.getElementById('subName').value : "";
+            var DateBool = dateBoolean.checked ? todaysDate : "";
+
             var FileExt = document.getElementById("FileFormat");
             var FileNameStr = {
-                filename :  FileName,
-                subfilename : SubFileName,
-                datebool : DateBool,
-                fileext : FileExt.value,
-                hostname : FirstName,
-                getFullFileName : function(){return `${this.filename+this.subfilename+this.datebool+'.'+this.fileext}`}
+                filename: FileName,
+                subfilename: SubFileName,
+                datebool: DateBool,
+                fileext: FileExt.value,
+                hostname: FirstName,
+                getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
             }
 
 
-          
+
             TextField = document.getElementById("TText");
             var FinalOutputList = TextField.value.split('\n');
 
 
 
             switch (FileExt.value) {
-                case "csv":
+                case "xlsx":
                     download_csv_file(FinalOutputList, FileNameStr);
                     break;
                 case "docx":
@@ -535,13 +734,13 @@ try {
         var GetAttendanceBTN = document.getElementById("check-1");
         GetAttendanceBTN.addEventListener("click", function () {
             port.postMessage({ joke: "Knock knock" });
-            
+
 
         })
 
         const Clip = document.getElementById('exclude');
         Clip.addEventListener('click', async () => {
-          
+
             port.postMessage({ joke: "exclude" });
 
 
@@ -580,13 +779,13 @@ try {
 
             TextField.value = text;
         });
-       
-        
+
+
         port.onMessage.addListener(function (msg) {
-          
+
             if (msg.request == "setList") {
                 FirstName = msg.hostname;
-                console.log("Presenter : "+FirstName);
+                console.log("Presenter : " + FirstName);
                 const TextField = document.getElementById("TText");
                 TextField.innerText = "";
                 for (i = 0; i < msg.data.length; i++) {
@@ -597,7 +796,7 @@ try {
                 // port.postMessage({ answer: "Madame" });
             }
             else if (msg.request == "ssPost") {
-               
+
                 // window.open(msg.data);
 
                 var downloadDiv = document.createElement("div");
@@ -612,9 +811,9 @@ try {
                 document.getElementById("ssBTN").click();
             }
             else if (msg.request == 'excludePresenter') {
-              
+
                 var List = document.getElementById("TText").value.split("\n");
-           
+
                 FirstName = msg.data;
                 for (i = 0; i < List.length; i++) {
                     if (List[i] == FirstName) {
