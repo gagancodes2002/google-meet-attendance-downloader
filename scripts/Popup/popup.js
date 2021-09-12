@@ -402,6 +402,7 @@ try {
 
 
     function download_doc(FinalOutputList, FileNameStr) {
+        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
         function getCell(data, _heading) {
             return new Paragraph({
 
@@ -437,13 +438,14 @@ try {
             })
         }
 
-
+        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
         const headRows = [getRowForHead('Subject', FileNameStr.filename),
         getRowForHead('Host Name', FileNameStr.hostname),
         getRowForHead('Time', FileNameStr.time),
         getRowForHead('Total Attendees', FileNameStr.attendeeslength),
-        getRowForHead('Remark', ' '),
+        getRowForHead('Remark', FileNameStr.remarks),
         ]
+        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
         const headTable = new Table(
             {
                 rows: headRows
@@ -906,7 +908,7 @@ try {
                 datebool: DateBool,
                 fileext: FileExt.value,
                 hostname: FirstName,
-                attendeeslength: AttendeesLength,
+                attendeeslength: AttendeesLength.toString(),
                 time: time,
                 getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
             }
