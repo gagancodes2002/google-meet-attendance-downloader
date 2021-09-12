@@ -142,10 +142,10 @@ try {
     function PopulateDataList() {
         $("#FileNames").html("");
         GetData(function () {
-            console.log("Callback Home 2" + GlobalDataList)
+
             if (GlobalDataList) {
                 GlobalDataList.forEach(function (item, n) {
-                    console.log('Inside WOrk : ' + item);
+
                     $('#FileNames').append(`<option value="${item}" class="Options">${item}</option>`)
                 });
             }
@@ -202,7 +202,7 @@ try {
 
         PopulateList(function () {
 
-            console.log(" Callback : 2")
+
             var list = document.getElementById("list");
             var listItems = list.querySelectorAll("li");
             var inputs = list.querySelectorAll("input");
@@ -216,11 +216,11 @@ try {
             //     console.log('Value is set to ' + listData);
             //   });
             chrome.storage.local.get(['FileNameList'], function (result) {
-                console.log('Value currently is ' + result.FileNameList);
+
             });
         })
         document.querySelector(`select[name="DateFormat"]`).addEventListener("change", function (event) {
-            console.log(event.target.selectedIndex)
+
             SetSavedDateFormat(event.target.selectedIndex);
         })
 
@@ -232,13 +232,13 @@ try {
 
 
                 var panel = document.getElementsByClassName("panel")[0];
-                console.log("This : " + this.classList)
+
 
                 if (this.classList.contains("active")) {
 
                     document.querySelectorAll(".accordion:nth-child(1) > span")[0].style.cssText = " transform: rotate(0deg);"
                     document.querySelectorAll(".accordion:nth-child(1) > span")[1].style.cssText = " transform: rotate(0deg);"
-                    console.log("Rotate : " + document.querySelectorAll(".accordion:nth-child(1) > span")[1].style.cssText)
+
                     this.classList.toggle("active");
                 }
                 else {
@@ -312,8 +312,8 @@ try {
     function getSS() {
         html2canvas(document.getElementsByClassName("GvcuGe")[0], { useCORS: true }).then(function (canvas) {
             var myImage = canvas.toDataURL("image/png");
+            window.open('', myImage);
 
-            console.log("myImage : " + myImage);
 
         });
     }
@@ -386,6 +386,7 @@ try {
         TextField.select();
         document.execCommand("copy");
 
+
     }
 
     function download_txt(FinalOutputList, FileNameStr) {
@@ -402,7 +403,7 @@ try {
 
 
     function download_doc(FinalOutputList, FileNameStr) {
-        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
+
         function getCell(data, _heading) {
             return new Paragraph({
 
@@ -438,14 +439,14 @@ try {
             })
         }
 
-        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
+
         const headRows = [getRowForHead('Subject', FileNameStr.filename),
         getRowForHead('Host Name', FileNameStr.hostname),
         getRowForHead('Time', FileNameStr.time),
         getRowForHead('Total Attendees', FileNameStr.attendeeslength),
         getRowForHead('Remark', FileNameStr.remarks),
         ]
-        console.log("LENGHT : DOC : "+FileNameStr.attendeeslength);
+
         const headTable = new Table(
             {
                 rows: headRows
@@ -599,12 +600,10 @@ try {
         });
 
         docx.Packer.toBlob(doc).then(blob => {
-            console.log(blob);
 
-            console.log("Document created successfully");
             var url = window.URL || window.webkitURL;
             var link = url.createObjectURL(blob);
-            console.log('Link : ' + link);
+
             downloadFile(FileNameStr, link);
         });
 
@@ -704,7 +703,7 @@ try {
                         }
                     }
 
-                  
+
                     const merge = [
                         { s: { r: 0, c: 0 }, e: { r: 2, c: 12 } },
                         { s: { r: 4, c: 4 }, e: { r: 4, c: 5 } },
@@ -758,7 +757,7 @@ try {
 
         var ws_name = "SheetJS";
         var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
-        
+
         /* add worksheet to workbook */
         wb.SheetNames.push(ws_name);
         wb.Sheets[ws_name] = ws;
@@ -766,7 +765,7 @@ try {
         var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
         var url = window.URL || window.webkitURL;
         var link = url.createObjectURL(blob);
-         
+
         downloadFile(FileNameStr, link);
 
         //     var wb = XLSX.utils.book_new();
@@ -916,7 +915,7 @@ try {
             switch (FileExt.value) {
                 case "xlsx":
                     askForRemark((result) => {
-                        console.log("RESULT : " + result);
+
                         FileNameStr.remarks = result;
                         download_csv_file(FinalOutputList, FileNameStr);
                     });
@@ -924,11 +923,11 @@ try {
                     break;
                 case "docx":
                     askForRemark((result) => {
-                        console.log("RESULT : " + result);
+
                         FileNameStr.remarks = result;
                         download_doc(FinalOutputList, FileNameStr);
                     });
-                   
+
                     break;
                 case "txt":
                     download_txt(FinalOutputList, FileNameStr);
@@ -951,6 +950,11 @@ try {
         catch (error) {
             console.log("Content script setup required")
         }
+        var ssButton = document.getElementById("takeSS");
+        ssButton.addEventListener("click", () => {
+            console.log("clicked");
+            port.postMessage({ joke: "take ss" });
+        })
         var GetAttendanceBTN = document.getElementById("check-1");
         GetAttendanceBTN.addEventListener("click", function () {
             port.postMessage({ joke: "Knock knock" });
@@ -993,12 +997,12 @@ try {
             TextField.value = text;
         });
 
-
-        port.onMessage.addListener(function (msg) {
+        
+        port.onMessage.addListener( function (msg) {
 
             if (msg.request == "setList") {
                 FirstName = msg.hostname;
-                console.log("Presenter : " + FirstName);
+
                 const TextField = document.getElementById("TText");
                 TextField.innerText = "";
                 for (i = 0; i < msg.data.length; i++) {
@@ -1011,6 +1015,9 @@ try {
             else if (msg.request == "ssPost") {
 
 
+                console.log("ssPost received " + msg.data);
+
+                
 
                 var downloadDiv = document.createElement("div");
                 downloadDiv.innerHTML = `<a

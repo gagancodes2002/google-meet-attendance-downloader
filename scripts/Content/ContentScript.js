@@ -7,10 +7,10 @@
 
             ScrapeAttendees(function (result) {
                 
-                console.log('Data : '+result);
+              
                   getPresenterName(function(name)
                   {
-                    console.log('Data : '+result+'Host name : '+name);
+                  
                     port.postMessage({ request: "setList", data: result , hostname  : name});
                    
                   })
@@ -32,6 +32,14 @@
             });
          
         }
+        if(msg.joke == 'take ss')
+        {
+            console.log("received");
+            getSS(function(result)
+            {
+                port.postMessage({request: 'ssPost',data: result});
+            })
+        }
 
         
 
@@ -47,6 +55,18 @@ function waitForElement(callBack) {
 }
  
 
+
+
+function getSS(callback) {
+    html2canvas(document.getElementsByClassName("GvcuGe")[0], { useCORS: true }).then(function (canvas) {
+        var myImage = canvas.toDataURL("image/png");
+        console.log("image : ",myImage);
+        callback(myImage);
+
+        return myImage;
+
+    });
+}
 
 function getPresenterName(callBack)
 {
@@ -98,7 +118,7 @@ function ScrapeAttendees(callBack1) {
 
         //console.log(document.getElementsByClassName("titleColumn")[0].getElementsByTagName("a")[0].text);
         for (i = 0; i < ListObj.length; i++) {
-            console.log(ListObj[i].innerText);
+            
             Attendees.push(ListObj[i].innerText);
         }
         callBack1(Attendees);
