@@ -1,5 +1,7 @@
 
 
+const { Table, AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, ShadingType, UnderlineType } = docx;
+
 var FirstName = '';
 try {
 
@@ -288,6 +290,25 @@ try {
 
     }
 
+    async function askForRemark(callback) {
+        var modal = document.getElementById("askUser");
+        var span = document.getElementsByClassName('close')[0];
+        var submitBTN = document.getElementById('submitRemarks');
+        submitBTN.addEventListener('click', () => {
+            modal.style.display = "none";
+
+            callback($('#remarks').val());
+            return $('#remarks').val();
+        })
+        modal.style.display = "block";
+        span.addEventListener('click', () => {
+            modal.style.display = "none";
+        })
+
+
+
+    }
+
     function getSS() {
         html2canvas(document.getElementsByClassName("GvcuGe")[0], { useCORS: true }).then(function (canvas) {
             var myImage = canvas.toDataURL("image/png");
@@ -368,8 +389,8 @@ try {
     }
 
     function download_txt(FinalOutputList, FileNameStr) {
-        var body = document.getElementsByTagName("body")[0];
-        txt = "";
+
+        txt = `Date :  ${FileNameStr.datebool}\nHost Name : ${FileNameStr.hostname}\nTime : ${FileNameStr.time}\nTotal Attendees : ${FileNameStr.attendeeslength}\nSubject : ${FileNameStr.filename}\n\nAttendees\n-----------\n`;
         FinalOutputList.forEach(function (row) {
             txt += row;
             txt += "\n";
@@ -381,166 +402,347 @@ try {
 
 
     function download_doc(FinalOutputList, FileNameStr) {
-        var body = document.getElementsByTagName("body")[0];
-        docx = "";
-        FinalOutputList.forEach(function (row) {
-            docx += row;
-            docx += "\n";
-        });
-        downloadFile(FileNameStr, 'data:text/docx;charset=utf-8,' + encodeURI(docx));
+        function getCell(data, _heading) {
+            return new Paragraph({
 
-    }
-    function sheet_from_array_of_arrays(data, opts) {
-        var ws = {};
-        var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 } };
-        for (var R = 0; R != data.length; ++R) {
-            for (var C = 0; C != data[R].length; ++C) {
-                if (range.s.r > R) range.s.r = R;
-                if (range.s.c > C) range.s.c = C;
-                if (range.e.r < R) range.e.r = R;
-                if (range.e.c < C) range.e.c = C;
-                var cell = { v: data[R][C] };
-                if (cell.v == null) continue;
-                var cell_ref = XLSX.utils.encode_cell({ c: C, r: R });
-
-                if (typeof cell.v === 'number') cell.t = 'n';
-                else if (typeof cell.v === 'boolean') cell.t = 'b';
-                else if (cell.v instanceof Date) {
-                    cell.t = 'n'; cell.z = XLSX.SSF._table[14];
-                    cell.v = datenum(cell.v);
-                }
-                else cell.t = 's';
-
-                if (C == 0 & R == 0) {
-                    cell.s =
-                    {
-                        font: {
-                            name: 'Calibri',
-                            bold: true,
-                            sz: "24",
-                            color:
-                                { rgb: 'f4f4ff' }
+                text: data,
+                heading: _heading,
+            })
+        };
+        function getRowForHead(title, data) {
+            return new docx.TableRow({
+                children: [
+                    new docx.TableCell({
+                        width: {
+                            size: 2500,
+                            type: docx.WidthType.DXA,
                         },
-                        alignment:
-                        {
-                            horizontal: "center",
-
-                            vertical: "center"
-
+                        children:
+                            [
+                                getCell(title, HeadingLevel.HEADING_2)
+                            ]
+                    })
+                    ,
+                    new docx.TableCell({
+                        width: {
+                            size: 2500,
+                            type: docx.WidthType.DXA,
                         },
-                        fill:
-                        {
-                            fgColor: { rgb: "212121" }
-                        },
-
-                    }
-                }
-                if( (C <= 12 & C >= 0) & (R <= 7 & R >= 3) )
-                {
-                    cell.s = {
-                        fill:
-                        {
-                            fgColor: { rgb: "ebf1de" }
-                        },
-                    }
-                }
-                if((C == 4 ||C == 5 ||C == 8 || C == 9) & (R >= 4 && R <= 6) )
-                {
-                    cell.s = {
-                        fill:
-                        {
-                            fgColor: { rgb: "ffff99" }
-                        },
-                        border:
-                        {
-                            top : {
-                                style : 'thin'
-                            },
-                            right : {
-                                style : 'thin'
-                            },
-                            left : {
-                                style : 'thin'
-                            },
-                            bottom : {
-                                style : 'thin'
-                            }
-                            
-                            
-                        },
-                        alignment : {
-                            horizontal : 'left'
-                        }
-                    }
-                }
-               if(R == 8 & C == 0)
-               {
-                   cell.s =
-                   {
-                        fill : 
-                        {
-                            fgColor : {rgb : 'c5d9f1'}
-                        }
-                   }
-               }
-              
-                // if (C == 0) {
-                //     cell.s = {
-                //         font: {
-                //             bold: true
-                //         }
-                //     }
-                // }
-                // if (R == 0) {
-                //     cell.s = {
-                //         fill: {
-                //             fgColor: { rgb: "212121" }
-                //         }
-                //     }
-                // }
-                const merge = [
-                    { s: { r: 0, c: 0 }, e: { r: 2, c: 12 } },
-                    { s: { r: 4, c: 4 }, e: { r: 4, c: 5 } },
-                    { s: { r: 5, c: 4 }, e: { r: 5, c: 5 } },
-                    { s: { r: 6, c: 4 }, e: { r: 6, c: 5 } },
-                    { s: { r: 4, c: 8 }, e: { r: 4, c: 9 } },
-                    { s: { r: 5, c: 8 }, e: { r: 5, c: 9 } },
-                    { s: { r: 6, c: 8 }, e: { r: 6, c: 9 } },
-
-
-                ];
-                ws["!merges"] = merge;
-                ws[cell_ref] = cell;
-            }
+                        children:
+                            [
+                                getCell(data, HeadingLevel.HEADING_3)
+                            ]
+                    })
+                ]
+            })
         }
-        if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range);
-        return ws;
-    }
-    function Workbook() {
-        if (!(this instanceof Workbook)) return new Workbook();
-        this.SheetNames = [];
-        this.Sheets = {};
-    }
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;
+
+
+        const headRows = [getRowForHead('Subject', FileNameStr.filename),
+        getRowForHead('Host Name', FileNameStr.hostname),
+        getRowForHead('Time', FileNameStr.time),
+        getRowForHead('Total Attendees', FileNameStr.attendeeslength),
+        getRowForHead('Remark', ' '),
+        ]
+        const headTable = new Table(
+            {
+                rows: headRows
+            }
+        )
+        const rowsT = [new docx.TableRow({
+            children: [
+                new docx.TableCell({
+                    width: {
+                        size: 1500,
+                        type: docx.WidthType.DXA,
+                    },
+
+                    children:
+                        [
+                            new Paragraph({
+                                text: "Attendees",
+                                heading: HeadingLevel.HEADING_4,
+                                shading: {
+                                    type: ShadingType.REVERSE_DIAGONAL_STRIPE,
+                                    color: "c5e0b3",
+                                    fill: "c5e0b3",
+                                },
+                            })
+                        ]
+                })
+            ]
+        })];
+        FinalOutputList.map((item, k) => {
+            rowsT.push(new docx.TableRow({
+                children: [
+                    new docx.TableCell({
+                        width: {
+                            size: 500,
+                            type: docx.WidthType.DXA,
+                        },
+                        children:
+                            [
+                                getCell(item, HeadingLevel.HEADING_3)
+                            ]
+                    })
+                ]
+            }));
+        })
+
+        const table = new docx.Table({
+            rows: rowsT
+
+
+        });
+
+        const doc = new docx.Document({
+            styles: {
+                paragraphStyles: [
+                    {
+                        id: "Heading1",
+                        name: "Heading 1",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        run: {
+                            size: '24pt',
+                            bold: true,
+                            font:
+                            {
+                                name: 'Calibri'
+
+                            }
+                        },
+
+                    },
+                    {
+                        id: "Heading2",
+                        name: "Heading 2",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        alignment: AlignmentType.LEFT,
+                        run: {
+                            size: '11pt',
+                            bold: true,
+                            font:
+                            {
+                                name: 'Calibri'
+
+                            }
+                        },
+
+                    },
+                    {
+                        id: "Heading3",
+                        name: "Heading 3",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        alignment: AlignmentType.LEFT,
+                        run: {
+                            size: '11pt',
+                            bold: false,
+                            font:
+                            {
+                                name: 'Calibri'
+
+                            }
+                        },
+
+                    },
+                    {
+                        id: "Heading4",
+                        name: "Heading 4",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        alignment: AlignmentType.LEFT,
+                        quickFormat: true,
+                        run: {
+                            size: '11pt',
+                            bold: true,
+                            font:
+                            {
+                                name: 'Calibri',
+                                fill: "c5e0b3"
+                            }
+                        },
+
+                    }
+                ]
+            },
+            sections: [{
+                properties: {},
+                children: [
+
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        text: "Meeting Attendance Sheet",
+                        heading: HeadingLevel.HEADING_1,
+                    }),
+                    new Paragraph({
+                        spacing: {
+                            before: 400,
+                        },
+                    }),
+                    headTable,
+                    new Paragraph({
+                        spacing: {
+                            before: 200,
+                        },
+                    }),
+                    table,
+                ],
+            }]
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+            console.log(blob);
+
+            console.log("Document created successfully");
+            var url = window.URL || window.webkitURL;
+            var link = url.createObjectURL(blob);
+            console.log('Link : ' + link);
+            downloadFile(FileNameStr, link);
+        });
+
+
     }
 
     function download_csv_file(csvFileData, FileNameStr) {
 
-        var today = new Date();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        function sheet_from_array_of_arrays(data, opts) {
+            var ws = {};
+            var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 } };
+            for (var R = 0; R != data.length; ++R) {
+                for (var C = 0; C != data[R].length; ++C) {
+                    if (range.s.r > R) range.s.r = R;
+                    if (range.s.c > C) range.s.c = C;
+                    if (range.e.r < R) range.e.r = R;
+                    if (range.e.c < C) range.e.c = C;
+                    var cell = { v: data[R][C] };
+                    if (cell.v == null) continue;
+                    var cell_ref = XLSX.utils.encode_cell({ c: C, r: R });
+
+                    if (typeof cell.v === 'number') cell.t = 'n';
+                    else if (typeof cell.v === 'boolean') cell.t = 'b';
+                    else if (cell.v instanceof Date) {
+                        cell.t = 'n'; cell.z = XLSX.SSF._table[14];
+                        cell.v = datenum(cell.v);
+                    }
+                    else cell.t = 's';
+
+                    if (C == 0 & R == 0) {
+                        cell.s =
+                        {
+                            font: {
+                                name: 'Calibri',
+                                bold: true,
+                                sz: "24",
+                                color:
+                                    { rgb: 'f4f4ff' }
+                            },
+                            alignment:
+                            {
+                                horizontal: "center",
+
+                                vertical: "center"
+
+                            },
+                            fill:
+                            {
+                                fgColor: { rgb: "212121" }
+                            },
+
+                        }
+                    }
+                    if ((C <= 12 & C >= 0) & (R <= 7 & R >= 3)) {
+                        cell.s = {
+                            fill:
+                            {
+                                fgColor: { rgb: "ebf1de" }
+                            },
+                        }
+                    }
+                    if ((C == 4 || C == 5 || C == 8 || C == 9) & (R >= 4 && R <= 6)) {
+                        cell.s = {
+                            fill:
+                            {
+                                fgColor: { rgb: "ffff99" }
+                            },
+                            border:
+                            {
+                                top: {
+                                    style: 'thin'
+                                },
+                                right: {
+                                    style: 'thin'
+                                },
+                                left: {
+                                    style: 'thin'
+                                },
+                                bottom: {
+                                    style: 'thin'
+                                }
+
+
+                            },
+                            alignment: {
+                                horizontal: 'left'
+                            }
+                        }
+                    }
+                    if (R == 8 & C == 0) {
+                        cell.s =
+                        {
+                            fill:
+                            {
+                                fgColor: { rgb: 'c5d9f1' }
+                            }
+                        }
+                    }
+
+                  
+                    const merge = [
+                        { s: { r: 0, c: 0 }, e: { r: 2, c: 12 } },
+                        { s: { r: 4, c: 4 }, e: { r: 4, c: 5 } },
+                        { s: { r: 5, c: 4 }, e: { r: 5, c: 5 } },
+                        { s: { r: 6, c: 4 }, e: { r: 6, c: 5 } },
+                        { s: { r: 4, c: 8 }, e: { r: 4, c: 9 } },
+                        { s: { r: 5, c: 8 }, e: { r: 5, c: 9 } },
+                        { s: { r: 6, c: 8 }, e: { r: 6, c: 9 } },
+
+
+                    ];
+                    ws["!merges"] = merge;
+                    ws[cell_ref] = cell;
+                }
+            }
+            if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range);
+            return ws;
+        }
+        function Workbook() {
+            if (!(this instanceof Workbook)) return new Workbook();
+            this.SheetNames = [];
+            this.Sheets = {};
+        }
+        function s2ab(s) {
+            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+            var view = new Uint8Array(buf);  //create uint8array as viewer
+            for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+            return buf;
+        }
+
+
         var data = [['Meeting Attendance Sheet', , ,],
-        ["","","","","","","","","","","","","","","","",],
-        ["","","","","","","","","","","","","","","","",],
-        ["","","","","","","","","","","","","","","","",],
-        ["","","" , "Date : ", FileNameStr.datebool, "", "", "Time :", time,"","","","","","","","","","","","","",""],
-        ["","","" ,  "Subject : ", FileNameStr.filename,"" ,"" , "Total Attendees :", csvFileData.length,"","","","","","","","","","","","","",""],
-        ["","","" ,  "Host Name : ", FileNameStr.hostname, "", "", "Remark :", 'lipsum lorem',"","","","","","","","","","","","","",""],
-        ["","","","","","","","","","","","","","","","",],
-        ["Name","","","","","","","","","","","","","","","",],
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",],
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",],
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",],
+        ["", "", "", "Date : ", FileNameStr.datebool, "", "", "Time :", FileNameStr.time, "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        ["", "", "", "Subject : ", FileNameStr.filename, "", "", "Total Attendees :", FileNameStr.attendeeslength, "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        ["", "", "", "Host Name : ", FileNameStr.hostname, "", "", "Remark :", FileNameStr.remarks, "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",],
+        ["Name", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",],
             // ["Subject", FileNameStr.filename, ,],
             // ["Hostname", FileNameStr.hostname ,,],
             // ["Total Attendees",12, ,],
@@ -548,13 +750,13 @@ try {
 
         ]
 
-        csvFileData.map((item,k)=>
-        {
-            data.push([item, , ,]);
+        csvFileData.map((item, k) => {
+            data.push([item]);
         })
 
         var ws_name = "SheetJS";
         var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+        
         /* add worksheet to workbook */
         wb.SheetNames.push(ws_name);
         wb.Sheets[ws_name] = ws;
@@ -562,7 +764,7 @@ try {
         var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
         var url = window.URL || window.webkitURL;
         var link = url.createObjectURL(blob);
-        console.log('Link : ' + link);
+         
         downloadFile(FileNameStr, link);
 
         //     var wb = XLSX.utils.book_new();
@@ -619,6 +821,7 @@ try {
             saveAs: false,
             conflictAction: "overwrite",
         });
+        Toast(FileNameStr);
     }
 
 
@@ -657,7 +860,7 @@ try {
     }
 
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const Clip = document.querySelector('#check-2');
         Clip.addEventListener('click', async () => {
 
@@ -687,28 +890,43 @@ try {
             var DateBool = dateBoolean.checked ? todaysDate : "";
 
             var FileExt = document.getElementById("FileFormat");
-            var FileNameStr = {
-                filename: FileName,
-                subfilename: SubFileName,
-                datebool: DateBool,
-                fileext: FileExt.value,
-                hostname: FirstName,
-                getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
-            }
+
 
 
 
             TextField = document.getElementById("TText");
             var FinalOutputList = TextField.value.split('\n');
 
-
+            var AttendeesLength = FinalOutputList.length - 1;
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            var FileNameStr = {
+                filename: FileName,
+                subfilename: SubFileName,
+                datebool: DateBool,
+                fileext: FileExt.value,
+                hostname: FirstName,
+                attendeeslength: AttendeesLength,
+                time: time,
+                getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
+            }
 
             switch (FileExt.value) {
                 case "xlsx":
-                    download_csv_file(FinalOutputList, FileNameStr);
+                    askForRemark((result) => {
+                        console.log("RESULT : " + result);
+                        FileNameStr.remarks = result;
+                        download_csv_file(FinalOutputList, FileNameStr);
+                    });
+
                     break;
                 case "docx":
-                    download_doc(FinalOutputList, FileNameStr);
+                    askForRemark((result) => {
+                        console.log("RESULT : " + result);
+                        FileNameStr.remarks = result;
+                        download_doc(FinalOutputList, FileNameStr);
+                    });
+                   
                     break;
                 case "txt":
                     download_txt(FinalOutputList, FileNameStr);
@@ -717,7 +935,7 @@ try {
 
                     break;
             }
-            Toast(FileNameStr);
+
 
 
         });
@@ -753,18 +971,11 @@ try {
 
             TextField = document.getElementById("TText");
             var text = TextField.value;
-            //    var text = text.substring(0,text.length-1);
+
             var textArray = text.split("\n");
             textArray.sort();
             text = textArray.toString();
-            //    for(i = 0 ; i<text.length;i++)
-            //    {
-            //        if (text[i]==",")
-            //        {
-            //            text[i] = "\n"
 
-            //        }
-            //    }
             text = text.replace(/,/g, "\n");
             for (i = 0; i < text.length; i++) {
                 if (text[i] == "\n") {
@@ -793,11 +1004,11 @@ try {
                 }
 
 
-                // port.postMessage({ answer: "Madame" });
+
             }
             else if (msg.request == "ssPost") {
 
-                // window.open(msg.data);
+
 
                 var downloadDiv = document.createElement("div");
                 downloadDiv.innerHTML = `<a
@@ -839,14 +1050,7 @@ try {
         document.getElementById("mySidenav").style.width = "0";
     }
 
-    // var port = chrome.tabs[0].connect({name: "knockknock"});
-    // port.postMessage({joke: "Knock knock"});
-    // port.onMessage.addListener(function(msg) {
-    //   if (msg.question == "Who's there?")
-    //     port.postMessage({answer: "Madame"});
-    //   else if (msg.question == "Madame who?")
-    //     port.postMessage({answer: "Madame... Bovary"});
-    // });  
+
 } catch (error) {
     console.log("Error : " + error)
 }

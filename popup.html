@@ -3,13 +3,14 @@
 
 <head>
     <script type="text/javascript" src="node_modules\chrome-extension-async\chrome-extension-async.js"></script>
-    
+
     <script type="text/javascript" src="jquery_3.6.0.js"></script>
     <script type="text/javascript" src="./xlsx/xls.core.min.js"></script>
+    <script type="text/javascript" src="./docx/docx.gen.js"></script>
     <script type="text/javascript" src="./xlsx/Blob.js"></script>
     <script type="text/javascript" src="./xlsx/FileSaver.js"></script>
     <script type="text/javascript" src="popup.js"></script>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
@@ -551,6 +552,55 @@
                 width: 80%;
             }
         }
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: -25px;
+            margin-right: -18px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -591,6 +641,19 @@
             <center>
 
 
+                <div id="askUser" class="modal">
+                    <div class="modal-content">
+                        <div class="closeCont">
+ <span class="close" aria-hidden="true">&times;</span>
+                        </div>
+                       
+                       
+                        <label style="color : black" for="remarks">Remarks : </label>
+                        <input type="text" id="remarks" placeholder="Remarks" value="Default">
+                        <button id="submitRemarks">Submit</button>
+                    </div>
+
+                </div>
 
                 <div class="row">
                     <button type="button" value="Test" id="check-1" class="square_btn">Get Attendance</button>
@@ -644,7 +707,7 @@
                 <center>
                     <table>
                         <tr>
-                            <th> 
+                            <th>
                                 <label style="font-weight: bold;">
                                     Filename
                                 </label>
@@ -660,11 +723,11 @@
                                 </label>
                             </th>
                             <th> <label for="Format">
-                                Format
-                            </label></th>
+                                    Format
+                                </label></th>
                         </tr>
                         <tr>
-                            <td> 
+                            <td>
                                 <input type="checkbox" id="FilenameBoolean" value="true" name="Date">
 
                             </td>
