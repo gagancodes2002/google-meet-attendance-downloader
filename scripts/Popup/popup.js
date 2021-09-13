@@ -196,7 +196,7 @@ try {
     document.addEventListener("DOMContentLoaded", () => {
 
 
-
+        
         SetDefaultDateFormat()
         PopulateDataList()
 
@@ -254,15 +254,6 @@ try {
                 }
             });
         }
-
-
-
-
-
-
-    })
-    document.addEventListener("DOMContentLoaded", () => {
-
         document.getElementById("SubHead").addEventListener("click", () => {
 
             openNav()
@@ -273,7 +264,137 @@ try {
             closeNav()
 
         })
+        document.getElementById("SettingBTN").addEventListener("click", () => {
+            window.open(document.URL + "#Settings", "_self")
+            document.getElementById("Home").style.display = "none"
+            document.getElementById("Settings").style.display = "block";
+            document.getElementById("overlay").style.display = "none";
+            var HeadView = document.getElementById("header")
+
+            HeadView.classList.toggle("HeadView");
+            HeadView.innerText = "Settings";
+
+            closeNav()
+
+
+        })
+        document.getElementById("HomeBTN").addEventListener("click", () => {
+            //  $("#Home").load(location.href + " #Home");
+            window.open(document.URL, "_self")
+            PopulateDataList()
+            document.getElementById("Settings").style.display = "none";
+            document.getElementById("Home").style.display = "block"
+            var HeadView = document.getElementById("header")
+            HeadView.innerText = "Home";
+            HeadView.classList.toggle("HeadView");
+
+
+            ResetSettingsView()
+
+
+        })
+        document.getElementById("overlay").addEventListener("click", () => {
+            document.getElementById("overlay").style.display = "none";
+            closeNav()
+        })
+
+        const clear = document.querySelector('#clear');
+        clear.addEventListener('click', async () => {
+            document.getElementById("TText").value = "";
+
+
+        });
+        const copy = document.querySelector('#copy');
+        copy.addEventListener('click', async () => {
+            SetClipboard();
+
+
+        });
+
+        const Clip = document.querySelector('#check-2');
+        Clip.addEventListener('click', async () => {
+
+            var Filename = document.getElementById("FileNames");
+            var d = new Date();
+            var todaysDate;
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            switch (GlobalSDF) {
+                case 0:
+                    todaysDate = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + (d.getDate())).slice(-2) + "-" + (d.getFullYear());
+                    break;
+                case 1:
+                    todaysDate = ("0" + (d.getDate())).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + (d.getFullYear());
+                    break;
+                case 2:
+                    todaysDate = (months[d.getMonth()]) + "-" + ("0" + (d.getDate())).slice(-2) + "-" + (d.getFullYear());
+                    break;
+
+                default:
+                    break;
+            }
+            var fileNameBoolean = document.getElementById('FilenameBoolean');
+            var subFileNameBoolean = document.getElementById('SubFilenameBoolean');
+            var dateBoolean = document.getElementById('DateBoolean');
+            var FileName = fileNameBoolean.checked ? document.getElementById('FileNames').value : "";
+            var SubFileName = subFileNameBoolean.checked ? document.getElementById('subName').value : "";
+            var DateBool = dateBoolean.checked ? todaysDate : "";
+
+            var FileExt = document.getElementById("FileFormat");
+
+
+
+
+            TextField = document.getElementById("TText");
+            var FinalOutputList = TextField.value.split('\n');
+
+            var AttendeesLength = FinalOutputList.length - 1;
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            var FileNameStr = {
+                filename: FileName,
+                subfilename: SubFileName,
+                datebool: DateBool,
+                fileext: FileExt.value,
+                hostname: FirstName,
+                attendeeslength: AttendeesLength.toString(),
+                time: time,
+                getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
+            }
+
+            switch (FileExt.value) {
+                case "xlsx":
+                    askForRemark((result) => {
+
+                        FileNameStr.remarks = result;
+                        download_csv_file(FinalOutputList, FileNameStr);
+                    });
+
+                    break;
+                case "docx":
+                    askForRemark((result) => {
+
+                        FileNameStr.remarks = result;
+                        download_doc(FinalOutputList, FileNameStr);
+                    });
+
+                    break;
+                case "txt":
+                    download_txt(FinalOutputList, FileNameStr);
+                    break;
+                default:
+
+                    break;
+            }
+
+
+
+        });
+
+
+
+
     })
+    
 
     function ResetSettingsView() {
         var acc = document.getElementsByClassName("accordion");
@@ -318,44 +439,7 @@ try {
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById("SettingBTN").addEventListener("click", () => {
-            window.open(document.URL + "#Settings", "_self")
-            document.getElementById("Home").style.display = "none"
-            document.getElementById("Settings").style.display = "block";
-            document.getElementById("overlay").style.display = "none";
-            var HeadView = document.getElementById("header")
-
-            HeadView.classList.toggle("HeadView");
-            HeadView.innerText = "Settings";
-
-            closeNav()
-
-
-        })
-        document.getElementById("HomeBTN").addEventListener("click", () => {
-            //  $("#Home").load(location.href + " #Home");
-            window.open(document.URL, "_self")
-            PopulateDataList()
-            document.getElementById("Settings").style.display = "none";
-            document.getElementById("Home").style.display = "block"
-            var HeadView = document.getElementById("header")
-            HeadView.innerText = "Home";
-            HeadView.classList.toggle("HeadView");
-
-
-            ResetSettingsView()
-
-
-        })
-        document.getElementById("overlay").addEventListener("click", () => {
-            document.getElementById("overlay").style.display = "none";
-            closeNav()
-        })
-
-
-    });
-
+    
 
 
 
@@ -827,23 +911,7 @@ try {
 
 
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const Clip = document.querySelector('#copy');
-        Clip.addEventListener('click', async () => {
-            SetClipboard();
-
-
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const Clip = document.querySelector('#clear');
-        Clip.addEventListener('click', async () => {
-            document.getElementById("TText").value = "";
-
-
-        });
-    });
+ 
 
 
 
@@ -860,87 +928,7 @@ try {
 
     }
 
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        const Clip = document.querySelector('#check-2');
-        Clip.addEventListener('click', async () => {
-
-            var Filename = document.getElementById("FileNames");
-            var d = new Date();
-            var todaysDate;
-            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            switch (GlobalSDF) {
-                case 0:
-                    todaysDate = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + (d.getDate())).slice(-2) + "-" + (d.getFullYear());
-                    break;
-                case 1:
-                    todaysDate = ("0" + (d.getDate())).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + (d.getFullYear());
-                    break;
-                case 2:
-                    todaysDate = (months[d.getMonth()]) + "-" + ("0" + (d.getDate())).slice(-2) + "-" + (d.getFullYear());
-                    break;
-
-                default:
-                    break;
-            }
-            var fileNameBoolean = document.getElementById('FilenameBoolean');
-            var subFileNameBoolean = document.getElementById('SubFilenameBoolean');
-            var dateBoolean = document.getElementById('DateBoolean');
-            var FileName = fileNameBoolean.checked ? document.getElementById('FileNames').value : "";
-            var SubFileName = subFileNameBoolean.checked ? document.getElementById('subName').value : "";
-            var DateBool = dateBoolean.checked ? todaysDate : "";
-
-            var FileExt = document.getElementById("FileFormat");
-
-
-
-
-            TextField = document.getElementById("TText");
-            var FinalOutputList = TextField.value.split('\n');
-
-            var AttendeesLength = FinalOutputList.length - 1;
-            var today = new Date();
-            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-            var FileNameStr = {
-                filename: FileName,
-                subfilename: SubFileName,
-                datebool: DateBool,
-                fileext: FileExt.value,
-                hostname: FirstName,
-                attendeeslength: AttendeesLength.toString(),
-                time: time,
-                getFullFileName: function () { return `${this.filename + this.subfilename + this.datebool + '.' + this.fileext}` }
-            }
-
-            switch (FileExt.value) {
-                case "xlsx":
-                    askForRemark((result) => {
-
-                        FileNameStr.remarks = result;
-                        download_csv_file(FinalOutputList, FileNameStr);
-                    });
-
-                    break;
-                case "docx":
-                    askForRemark((result) => {
-
-                        FileNameStr.remarks = result;
-                        download_doc(FinalOutputList, FileNameStr);
-                    });
-
-                    break;
-                case "txt":
-                    download_txt(FinalOutputList, FileNameStr);
-                    break;
-                default:
-
-                    break;
-            }
-
-
-
-        });
-    });
+ 
 
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         var activeTab = tabs[0];
@@ -962,8 +950,8 @@ try {
 
         })
 
-        const Clip = document.getElementById('exclude');
-        Clip.addEventListener('click', async () => {
+        const exclude = document.getElementById('exclude');
+        exclude.addEventListener('click', async () => {
 
             port.postMessage({ joke: "exclude" });
 
