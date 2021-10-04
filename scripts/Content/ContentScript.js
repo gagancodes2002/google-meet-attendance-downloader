@@ -1,47 +1,42 @@
- chrome.runtime.onConnect.addListener(function (port) {
+chrome.runtime.onConnect.addListener(function (port) {
     console.assert(port.name == "knockknock");
     port.onMessage.addListener(function (msg) {
-       
+
         if (msg.joke == "Knock knock") {
 
 
             ScrapeAttendees(function (result) {
-                
-              
-                  getPresenterName(function(name)
-                  {
-                  
-                    port.postMessage({ request: "setList", data: result , hostname  : name});
-                   
-                  })
-                   
-           
-               
+
+
+                getPresenterName(function (name) {
+
+                    port.postMessage({ request: "setList", data: result, hostname: name });
+
+                })
+
+
+
             });
-        
-          
+
+
 
 
         }
-        if(msg.joke == 'exclude')
-        {
-          
-            getPresenterName(function(result)
-            {
-                port.postMessage({request: 'excludePresenter',data: result});
+        if (msg.joke == 'exclude') {
+
+            getPresenterName(function (result) {
+                port.postMessage({ request: 'excludePresenter', data: result });
             });
-         
+
         }
-        if(msg.joke == 'take ss')
-        {
+        if (msg.joke == 'take ss') {
             console.log("received");
-            getSS(function(result)
-            {
-                port.postMessage({request: 'ssPost',data: result});
+            getSS(function (result) {
+                port.postMessage({ request: 'ssPost', data: result });
             })
         }
 
-        
+
 
     });
 });
@@ -53,14 +48,14 @@ function waitForElement(callBack) {
         callBack();
     }, 500);
 }
- 
+
 
 
 
 function getSS(callback) {
     html2canvas(document.getElementsByClassName("GvcuGe")[0], { useCORS: true }).then(function (canvas) {
         var myImage = canvas.toDataURL("image/png");
-        console.log("image : ",myImage);
+        console.log("image : ", myImage);
         callback(myImage);
 
         return myImage;
@@ -68,18 +63,17 @@ function getSS(callback) {
     });
 }
 
-function getPresenterName(callBack)
-{
-   
-        var hostname = document.getElementsByClassName('jcGw9c')[0].parentElement.getElementsByClassName('ZjFb7c')[0].innerText
-        callBack(hostname);
-        return hostname;
-   
-      
-    
+function getPresenterName(callBack) {
+
+    var hostname = document.getElementsByClassName('jcGw9c')[0].parentElement.getElementsByClassName('ZjFb7c')[0].innerText
+    callBack(hostname);
+    return hostname;
+
+
+
 }
 
- 
+
 function ScrapeAttendees(callBack1) {
 
 
@@ -113,12 +107,12 @@ function ScrapeAttendees(callBack1) {
 
     waitForElement(function () {
         var ListObj = document.getElementsByClassName("ZjFb7c");
-      
+
         var Attendees = [];
 
         //console.log(document.getElementsByClassName("titleColumn")[0].getElementsByTagName("a")[0].text);
         for (i = 0; i < ListObj.length; i++) {
-            
+
             Attendees.push(ListObj[i].innerText);
         }
         callBack1(Attendees);

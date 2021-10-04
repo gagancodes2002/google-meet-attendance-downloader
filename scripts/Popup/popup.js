@@ -1,5 +1,6 @@
 
 
+
 const { Table, AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, ShadingType, UnderlineType } = docx;
 
 var FirstName = '';
@@ -129,6 +130,7 @@ try {
         input.addEventListener("keydown", keyInput);
     }
 
+
     function addChild() {
 
 
@@ -139,25 +141,58 @@ try {
         list.appendChild(entry);
         setEventListener(entry, entry.lastChild);
     }
+
+    function setDefault() {
+        GeneralToast("Please set file names in settings : using default");
+        chrome.storage.local.set({ FileNameList: ["Default"] });
+        PopulateDataList();
+    }
+    function setDefined() {
+        GlobalDataList.forEach(function (item, n) {
+
+            $('#FileNames').append(`<option value="${item}" class="Options">${item}</option>`)
+        });
+    }
     function PopulateDataList() {
         $("#FileNames").html("");
         GetData(function () {
 
-            if (GlobalDataList) {
-                GlobalDataList.forEach(function (item, n) {
 
-                    $('#FileNames').append(`<option value="${item}" class="Options">${item}</option>`)
-                });
-            }
-            else {
-                console.log("Set File Names")
-            }
+
+            GlobalDataList ? GlobalDataList.length == 0 ? setDefault() : setDefined() : setDefault();
+
+            // if (GlobalDataList) {
+            //     if (GlobalDataList.length == 0) {
+            //         GeneralToast("Please set file names in settings : using default");
+            //         chrome.storage.local.set({ FileNameList: ["Default_after"] }, function (res) {
+            //             console.log("Result :" + res);
+            //         });
+            //         PopulateDataList();
+            //     }
+            //     else {
+
+            //     }
+            // }
+            // else {
+
+            //     GeneralToast("Please set file names in settings : using default");
+            //     chrome.storage.local.set({ FileNameList: ["Default_after"] }, function (res) {
+            //         console.log("Result :" + res);
+            //     });
+            //     PopulateDataList();
+
+            // }
 
         });
 
 
     }
-
+    function GeneralToast(text) {
+        var x = document.getElementById("snackbar");
+        x.className = "show"; f =
+            x.innerText = text;
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+    }
 
     async function GetSavedDateFormat(callback) {
         await chrome.storage.local.get(['SavedDateType'], async function (result) {
@@ -196,7 +231,7 @@ try {
     document.addEventListener("DOMContentLoaded", () => {
 
 
-        
+
         SetDefaultDateFormat()
         PopulateDataList()
 
@@ -347,7 +382,7 @@ try {
             TextField = document.getElementById("TText");
             var FinalOutputList = TextField.value.split('\n');
 
-            var AttendeesLength = FinalOutputList.length - 1;
+            var AttendeesLength = FinalOutputList.length;
             var today = new Date();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
             var FileNameStr = {
@@ -394,7 +429,7 @@ try {
 
 
     })
-    
+
 
     function ResetSettingsView() {
         var acc = document.getElementsByClassName("accordion");
@@ -439,7 +474,7 @@ try {
         });
     }
 
-    
+
 
 
 
@@ -911,7 +946,7 @@ try {
 
 
 
- 
+
 
 
 
@@ -923,12 +958,12 @@ try {
 
         var x = document.getElementById("snackbar");
         x.className = "show"; f =
-            x.innerText += '\n' + FileNameStr.getFullFileName();
+            x.innerText = "File downloaded \n " + FileNameStr.getFullFileName();
         setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
 
     }
 
- 
+
 
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         var activeTab = tabs[0];
@@ -985,8 +1020,8 @@ try {
             TextField.value = text;
         });
 
-        
-        port.onMessage.addListener( function (msg) {
+
+        port.onMessage.addListener(function (msg) {
 
             if (msg.request == "setList") {
                 FirstName = msg.hostname;
@@ -1005,7 +1040,7 @@ try {
 
                 console.log("ssPost received " + msg.data);
 
-                
+
 
                 var downloadDiv = document.createElement("div");
                 downloadDiv.innerHTML = `<a
