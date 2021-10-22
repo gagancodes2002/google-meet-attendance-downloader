@@ -65,7 +65,7 @@ function getSS(callback) {
 
 function getPresenterName(callBack) {
 
-    var hostname = document.getElementsByClassName('jcGw9c')[0].parentElement.getElementsByClassName('ZjFb7c')[0].innerText
+    var hostname = document.querySelectorAll('.jcGw9c').length > 0 ? document.querySelectorAll('.jcGw9c')[0].parentElement.getElementsByClassName('ZjFb7c')[0].innerText : document.querySelectorAll('.KV1GEc')[0].parentElement.getElementsByClassName('ZjFb7c')[0].innerText;
     callBack(hostname);
     return hostname;
 
